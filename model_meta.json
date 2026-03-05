@@ -1,0 +1,59 @@
+{
+  "static_features": [
+    "years_practice",
+    "panel_size",
+    "activity_score",
+    "msl_visits_6m",
+    "competitive_switches",
+    "events_attended",
+    "days_since_rx",
+    "rx_trend",
+    "rx_volatility",
+    "rx_total_12m",
+    "rx_last3_share",
+    "engagement_idx",
+    "rx_per_patient",
+    "specialty_enc",
+    "region_enc",
+    "tier_enc"
+  ],
+  "rx_cols": [
+    "rx_month_1",
+    "rx_month_2",
+    "rx_month_3",
+    "rx_month_4",
+    "rx_month_5",
+    "rx_month_6",
+    "rx_month_7",
+    "rx_month_8",
+    "rx_month_9",
+    "rx_month_10",
+    "rx_month_11",
+    "rx_month_12"
+  ],
+  "xgb_weight": 0.8500000000000002,
+  "lstm_weight": 0.1499999999999998,
+  "optimal_threshold": 0.43544321060180663,
+  "roc_auc": 0.6817,
+  "f1_score": 0.6437,
+  "specialties": [
+    "Cardiology",
+    "Immunology",
+    "Internal Medicine",
+    "Neurology",
+    "Oncology",
+    "Rheumatology"
+  ],
+  "regions": [
+    "Midwest",
+    "Northeast",
+    "Southeast",
+    "Southwest",
+    "West"
+  ],
+  "tiers": [
+    "Tier 1 - KOL",
+    "Tier 2 - High Value",
+    "Tier 3 - Standard"
+  ]
+}

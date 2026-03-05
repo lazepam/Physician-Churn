@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PharmaCRM — Physician Churn Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #070B14;
+  --card:    #0E1421;
+  --border:  #1E2D45;
+  --blue:    #4F8EF7;
+  --cyan:    #22D3EE;
+  --green:   #34D399;
+  --yellow:  #FBBF24;
+  --orange:  #FB923C;
+  --red:     #F87171;
+  --text:    #F1F5F9;
+  --sub:     #94A3B8;
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'Inter', sans-serif;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  background:var(--bg); color:var(--text);
+  font-family:var(--sans); font-size:16px; min-height:100vh;
+  background-image:
+    radial-gradient(ellipse 70% 40% at 15% 0%, rgba(79,142,247,0.09) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 35% at 85% 100%, rgba(34,211,238,0.06) 0%, transparent 65%);
+}
+
+/* HEADER */
+header {
+  display:flex; align-items:center; gap:16px; padding:16px 40px;
+  border-bottom:1px solid var(--border);
+  background:rgba(14,20,33,0.95); backdrop-filter:blur(14px);
+  position:sticky; top:0; z-index:100;
+}
+.logo-icon {
+  width:40px; height:40px; border-radius:10px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+.logo-name { font-family:var(--mono); font-size:18px; font-weight:700; letter-spacing:0.05em; }
+.logo-desc { font-size:13px; color:var(--sub); margin-top:2px; }
+.header-right { margin-left:auto; display:flex; gap:10px; }
+.hbadge { padding:6px 16px; border-radius:100px; font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.08em; }
+.hb-blue { background:rgba(79,142,247,0.15); color:var(--blue); border:1px solid rgba(79,142,247,0.35); }
+.hb-cyan { background:rgba(34,211,238,0.12); color:var(--cyan); border:1px solid rgba(34,211,238,0.3); }
+
+/* LAYOUT */
+main { max-width:1320px; margin:0 auto; padding:44px 28px; display:grid; grid-template-columns:1fr 460px; gap:28px; }
+
+/* HERO */
+.hero { grid-column:1/-1; margin-bottom:4px; }
+.hero h1 { font-size:clamp(28px,3.5vw,44px); font-weight:700; line-height:1.15; }
+.hero h1 em { font-style:normal; color:var(--cyan); }
+.hero p { color:var(--sub); font-size:16px; margin-top:10px; max-width:560px; line-height:1.75; }
+.mtags { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+.mtag { padding:7px 18px; border-radius:8px; font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:0.06em; }
+.mt-lstm { background:rgba(34,211,238,0.1); color:var(--cyan); border:1px solid rgba(34,211,238,0.25); }
+.mt-xgb  { background:rgba(79,142,247,0.1); color:var(--blue); border:1px solid rgba(79,142,247,0.25); }
+.mt-ens  { background:rgba(52,211,153,0.1); color:var(--green); border:1px solid rgba(52,211,153,0.25); }
+
+/* CARD */
+.card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:18px; padding:32px; position:relative; overflow:hidden;
+}
+.card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--blue),transparent); opacity:0.5;
+}
+.ctitle { font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--sub); margin-bottom:26px; }
+
+/* FORM */
+.fsec { margin-bottom:26px; }
+.slabel { font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--cyan); margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid rgba(34,211,238,0.2); }
+.fg  { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.fgi { display:flex; flex-direction:column; gap:7px; }
+.fgi.full { grid-column:1/-1; }
+
+label { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--sub); }
+
+input, select {
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:10px; padding:12px 16px; color:var(--text);
+  font-family:var(--mono); font-size:15px;
+  transition:border-color 0.2s, box-shadow 0.2s; outline:none; width:100%;
+}
+input:focus, select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(79,142,247,0.12); }
+select option { background:#0E1421; }
+
+.slider-row { display:flex; align-items:center; gap:14px; }
+input[type=range] { flex:1; height:5px; accent-color:var(--blue); cursor:pointer; border:none; padding:0; background:var(--border); }
+.sval { font-family:var(--mono); font-size:18px; font-weight:700; color:var(--blue); width:44px; text-align:right; border:none; background:transparent; padding:0; }
+
+.rxgrid { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
+.rxi { display:flex; flex-direction:column; gap:5px; }
+.rxi label { font-size:11px; color:var(--sub); text-align:center; letter-spacing:0.08em; font-weight:600; }
+.rxi input  { text-align:center; padding:10px 4px; font-size:14px; }
+
+.btn {
+  margin-top:10px; width:100%; padding:16px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  color:#fff; border:none; border-radius:12px;
+  font-family:var(--mono); font-size:14px; font-weight:700; letter-spacing:0.07em;
+  cursor:pointer; transition:all 0.2s; position:relative; overflow:hidden;
+}
+.btn:hover { opacity:0.9; transform:translateY(-1px); box-shadow:0 10px 28px rgba(79,142,247,0.3); }
+.btn.loading { pointer-events:none; opacity:0.7; }
+.btn.loading::after {
+  content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+  animation:shimmer 1s infinite;
+}
+@keyframes shimmer { to{left:100%} }
+
+/* RESULT PANEL */
+.rpanel { position:sticky; top:76px; display:flex; flex-direction:column; gap:18px; }
+
+.rcard {
+  background:var(--card); border:1.5px solid var(--border);
+  border-radius:18px; padding:30px; min-height:340px;
+  display:flex; flex-direction:column; gap:16px;
+  transition:border-color 0.4s;
+}
+.rcard.CRITICAL { border-color:var(--red); }
+.rcard.HIGH     { border-color:var(--orange); }
+.rcard.MODERATE { border-color:var(--yellow); }
+.rcard.LOW      { border-color:var(--green); }
+
+.empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; }
+.empty svg { opacity:0.2; }
+.empty p { font-size:14px; color:var(--sub); line-height:1.7; }
+
+.rtop { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.pnum { font-family:var(--mono); font-size:72px; font-weight:700; line-height:1; letter-spacing:-0.03em; }
+.pnum.CRITICAL { color:var(--red); }
+.pnum.HIGH     { color:var(--orange); }
+.pnum.MODERATE { color:var(--yellow); }
+.pnum.LOW      { color:var(--green); }
+.plbl { font-size:14px; color:var(--sub); margin-top:6px; font-weight:500; }
+
+.rbadge { padding:8px 20px; border-radius:100px; font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:0.1em; white-space:nowrap; }
+.rbadge.CRITICAL { background:rgba(248,113,113,0.15); color:var(--red);    border:1px solid rgba(248,113,113,0.35); }
+.rbadge.HIGH     { background:rgba(251,146,60,0.15);  color:var(--orange); border:1px solid rgba(251,146,60,0.35); }
+.rbadge.MODERATE { background:rgba(251,191,36,0.15);  color:var(--yellow); border:1px solid rgba(251,191,36,0.35); }
+.rbadge.LOW      { background:rgba(52,211,153,0.15);  color:var(--green);  border:1px solid rgba(52,211,153,0.35); }
+
+.gauge { height:6px; background:var(--border); border-radius:100px; overflow:hidden; }
+.gbar  { height:100%; border-radius:100px; transition:width 0.9s cubic-bezier(0.34,1.56,0.64,1); }
+.gbar.CRITICAL { background:var(--red); }
+.gbar.HIGH     { background:var(--orange); }
+.gbar.MODERATE { background:var(--yellow); }
+.gbar.LOW      { background:var(--green); }
+
+.mbreak { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.mc { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px 10px; text-align:center; }
+.mc-v { font-family:var(--mono); font-size:20px; font-weight:700; }
+.mc-l { font-size:11px; color:var(--sub); text-transform:uppercase; letter-spacing:0.09em; margin-top:5px; font-weight:600; }
+.mc-v.xgb  { color:var(--blue); }
+.mc-v.lstm { color:var(--cyan); }
+.mc-v.hyb  { color:var(--green); }
+
+.rmsg { font-size:14px; color:var(--sub); line-height:1.75; padding:14px 16px; background:var(--bg); border-radius:10px; border:1px solid var(--border); font-weight:500; }
+
+.rlbl { font-family:var(--mono); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; margin-bottom:10px; }
+.rlbl.r { color:var(--red); }
+.rlbl.g { color:var(--green); }
+
+.rflist, .ralist { display:flex; flex-direction:column; gap:8px; }
+.rfi, .rai { display:flex; align-items:flex-start; gap:10px; padding:11px 14px; border-radius:8px; font-size:13px; color:var(--sub); line-height:1.6; font-weight:500; }
+.rfi { background:rgba(248,113,113,0.06); border-left:2.5px solid var(--red); }
+.rai { background:rgba(52,211,153,0.06);  border-left:2.5px solid var(--green); }
+.rfi .dot { color:var(--red);   font-size:16px; line-height:1; flex-shrink:0; }
+.rai .dot { color:var(--green); font-size:16px; line-height:1; flex-shrink:0; }
+
+.acard { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px 24px; }
+.act   { font-family:var(--mono); font-size:11px; color:var(--sub); text-transform:uppercase; letter-spacing:0.14em; margin-bottom:12px; }
+.aep   { font-family:var(--mono); font-size:14px; color:var(--blue); font-weight:600; }
+.alinks { display:flex; gap:16px; margin-top:10px; }
+.alinks a { font-size:13px; color:var(--sub); text-decoration:none; border-bottom:1px solid var(--border); padding-bottom:1px; transition:color 0.2s; }
+.alinks a:hover { color:var(--cyan); }
+
+.stats { grid-column:1/-1; display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.sc { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:22px 26px; }
+.sc .sv { font-family:var(--mono); font-size:28px; font-weight:700; color:var(--blue); }
+.sc .sl { font-size:13px; color:var(--sub); margin-top:6px; text-transform:uppercase; letter-spacing:0.09em; font-weight:600; }
+
+@media(max-width:960px) {
+  main { grid-template-columns:1fr; }
+  .rpanel { position:static; }
+  .stats { grid-template-columns:1fr 1fr; }
+  .rxgrid { grid-template-columns:repeat(4,1fr); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">⚕</div>
+  <div>
+    <div class="logo-name">PHARMACRM</div>
+    <div class="logo-desc">Physician Intelligence Platform</div>
+  </div>
+  <div class="header-right">
+    <div class="hbadge hb-blue">LSTM + XGBoost</div>
+    <div class="hbadge hb-cyan">Hybrid Ensemble</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="hero">
+    <h1>Physician Churn<br/><em>Prediction Engine</em></h1>
+    <p>IQVIA-style pharma CRM intelligence. Predict which physicians are at risk of disengagement — before it happens.</p>
+    <div class="mtags">
+      <div class="mtag mt-lstm">LSTM · 12-Month Rx Trend</div>
+      <div class="mtag mt-xgb">XGBoost · Engagement Features</div>
+      <div class="mtag mt-ens">Hybrid Ensemble · Optimized Threshold</div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="card">
+    <div class="ctitle">// Physician Profile Input</div>
+
+    <div class="fsec">
+      <div class="slabel">Physician Classification</div>
+      <div class="fg">
+        <div class="fgi"><label>Specialty</label>
+          <select id="specialty">
+            <option>Oncology</option><option>Immunology</option><option>Cardiology</option>
+            <option>Neurology</option><option>Internal Medicine</option><option>Rheumatology</option>
+          </select>
+        </div>
+        <div class="fgi"><label>Region</label>
+          <select id="region">
+            <option>Northeast</option><option>Southeast</option><option>Midwest</option>
+            <option>West</option><option>Southwest</option>
+          </select>
+        </div>
+        <div class="fgi"><label>CRM Tier</label>
+          <select id="tier">
+            <option>Tier 1 - KOL</option><option selected>Tier 2 - High Value</option><option>Tier 3 - Standard</option>
+          </select>
+        </div>
+        <div class="fgi"><label>Years in Practice</label><input type="number" id="years_practice" min="1" max="50" value="12"/></div>
+        <div class="fgi"><label>Patient Panel Size</label><input type="number" id="panel_size" min="50" max="1000" value="350"/></div>
+        <div class="fgi"><label>Days Since Last Rx</label><input type="number" id="days_since_rx" min="0" max="365" value="25"/></div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="slabel">Engagement Metrics</div>
+      <div class="fgi full" style="margin-bottom:14px;">
+        <label>Activity Score (0 – 100)</label>
+        <div class="slider-row">
+          <input type="range" id="aslider" min="0" max="100" value="58"
+                 oninput="document.getElementById('activity_score').value=this.value"/>
+          <input class="sval" type="number" id="activity_score" min="0" max="100" value="58"
+                 oninput="document.getElementById('aslider').value=this.value"/>
+        </div>
+      </div>
+      <div class="fg">
+        <div class="fgi"><label>MSL Visits (Last 6M)</label><input type="number" id="msl_visits_6m" min="0" max="30" value="3"/></div>
+        <div class="fgi"><label>Events Attended</label><input type="number" id="events_attended" min="0" max="20" value="2"/></div>
+        <div class="fgi full"><label>Competitive Brand Switches</label><input type="number" id="competitive_switches" min="0" max="20" value="1"/></div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="slabel">Monthly Prescription Volume — Last 12 Months &nbsp;(LSTM Input)</div>
+      <div class="rxgrid" id="rxGrid"></div>
+    </div>
+
+    <button class="btn" id="predictBtn" onclick="runPrediction()">⚕ &nbsp; RUN CHURN ANALYSIS &nbsp; →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="rpanel">
+    <div class="rcard" id="rcard">
+      <div class="ctitle">// Churn Intelligence Output</div>
+      <div class="empty" id="empty">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+        </svg>
+        <p>Enter a physician profile<br/>and run the churn analysis.</p>
+      </div>
+      <div id="rcontent" style="display:none;flex-direction:column;gap:16px;">
+        <div class="rtop">
+          <div><div class="pnum" id="pnum">—</div><div class="plbl">Churn Probability</div></div>
+          <div class="rbadge" id="rbadge">—</div>
+        </div>
+        <div class="gauge"><div class="gbar" id="gbar" style="width:0%"></div></div>
+        <div class="mbreak">
+          <div class="mc"><div class="mc-v xgb"  id="xgbv">—</div><div class="mc-l">XGBoost</div></div>
+          <div class="mc"><div class="mc-v lstm" id="lstmv">—</div><div class="mc-l">LSTM</div></div>
+          <div class="mc"><div class="mc-v hyb"  id="hybv">—</div><div class="mc-l">Hybrid</div></div>
+        </div>
+        <div class="rmsg" id="rmsg"></div>
+        <div><div class="rlbl r">⚠ Risk Factors Detected</div><div class="rflist" id="rflist"></div></div>
+        <div><div class="rlbl g">✅ Recommended CRM Actions</div><div class="ralist" id="ralist"></div></div>
+      </div>
+    </div>
+    <div class="acard">
+      <div class="act">// API Access</div>
+      <div class="aep">POST &nbsp;/predict</div>
+      <div class="alinks">
+        <a href="/docs" target="_blank">Swagger UI →</a>
+        <a href="/model-info" target="_blank">Model Info →</a>
+        <a href="/health" target="_blank">Health →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="sc"><div class="sv">0.682</div><div class="sl">ROC-AUC Score</div></div>
+    <div class="sc"><div class="sv">0.644</div><div class="sl">F1 Score</div></div>
+    <div class="sc"><div class="sv">LSTM+XGB</div><div class="sl">Hybrid Architecture</div></div>
+    <div class="sc"><div class="sv">2,000</div><div class="sl">Physicians Trained</div></div>
+  </div>
+
+</main>
+
+<script>
+const months  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const defaults = [18,20,19,22,17,15,14,13,14,11,12,9];
+const g = document.getElementById('rxGrid');
+months.forEach((m,i) => {
+  const d = document.createElement('div'); d.className = 'rxi';
+  d.innerHTML = `<label>${m}</label><input type="number" id="rx_${i}" min="0" value="${defaults[i]}" step="1"/>`;
+  g.appendChild(d);
+});
+
+async function runPrediction() {
+  const btn = document.getElementById('predictBtn');
+  btn.classList.add('loading'); btn.textContent = 'ANALYZING...';
+  const rx = Array.from({length:12},(_,i)=>parseFloat(document.getElementById(`rx_${i}`).value)||0);
+  const payload = {
+    specialty: document.getElementById('specialty').value,
+    region: document.getElementById('region').value,
+    tier: document.getElementById('tier').value,
+    years_practice: parseInt(document.getElementById('years_practice').value),
+    panel_size: parseInt(document.getElementById('panel_size').value),
+    activity_score: parseFloat(document.getElementById('activity_score').value),
+    msl_visits_6m: parseInt(document.getElementById('msl_visits_6m').value),
+    competitive_switches: parseInt(document.getElementById('competitive_switches').value),
+    events_attended: parseInt(document.getElementById('events_attended').value),
+    days_since_rx: parseInt(document.getElementById('days_since_rx').value),
+    rx_monthly: rx,
+  };
+  try {
+    const res  = await fetch('/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail||'API error');
+    showResult(data);
+  } catch(err) { alert('Error: '+err.message); }
+  finally { btn.classList.remove('loading'); btn.innerHTML = '⚕ &nbsp; RUN CHURN ANALYSIS &nbsp; →'; }
+}
+
+function showResult(data) {
+  const pct = (data.churn_probability*100).toFixed(1), risk = data.risk_level;
+  document.getElementById('empty').style.display = 'none';
+  const rc = document.getElementById('rcontent'); rc.style.display = 'flex';
+  document.getElementById('pnum').textContent  = pct+'%';
+  document.getElementById('pnum').className    = 'pnum '+risk;
+  document.getElementById('rbadge').textContent= '● '+risk;
+  document.getElementById('rbadge').className  = 'rbadge '+risk;
+  document.getElementById('rmsg').textContent  = data.message;
+  document.getElementById('xgbv').textContent  = (data.xgb_probability*100).toFixed(1)+'%';
+  document.getElementById('lstmv').textContent = (data.lstm_probability*100).toFixed(1)+'%';
+  document.getElementById('hybv').textContent  = pct+'%';
+  document.getElementById('rcard').className   = 'rcard '+risk;
+  setTimeout(()=>{ const b=document.getElementById('gbar'); b.className='gbar '+risk; b.style.width=pct+'%'; },120);
+  document.getElementById('rflist').innerHTML = data.top_risk_factors.map(f=>`<div class="rfi"><span class="dot">▸</span>${f}</div>`).join('');
+  document.getElementById('ralist').innerHTML = data.recommended_actions.map(a=>`<div class="rai"><span class="dot">✓</span>${a}</div>`).join('');
+}
+</script>
+</body>
+</html>
