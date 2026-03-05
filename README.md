@@ -211,7 +211,7 @@ curl -X POST http://localhost:8000/predict \
 | `tier` | KOL / High Value / Standard | Priority segmentation |
 | `rx_volatility` | Std dev of monthly Rx volumes | Prescription consistency |
 
-> **Clinical Pharmacy Insight:** These features were designed to reflect real pharmaceutical CRM behavior — MSL visit frequency, formulary access patterns, and competitive landscape dynamics that standard ML feature sets miss entirely. This domain knowledge comes from 15+ years of pharmaceutical industry experience.
+> **Clinical Pharmacy Insight:** These features were designed to reflect real pharmaceutical CRM behavior — MSL visit frequency, formulary access patterns, and competitive landscape dynamics that standard ML feature sets miss entirely. This domain knowledge comes from 20+ years of pharmaceutical industry experience.
 
 ---
 
@@ -286,4 +286,4 @@ Data Scientist | GenAI & LLM Specialist | Clinical Pharmacy Expert
 🔗 [linkedin.com/in/matt-derya](https://linkedin.com/in/matt-derya)  
 📧 mattderya@gmail.com  
 
-*15+ years pharmaceutical industry (OctaPharma, Mentor R&D) · 6+ years AI/ML production systems*
+*20+ years pharmaceutical industry (OctaPharma, Mentor R&D) · 6+ years AI/ML production systems*
