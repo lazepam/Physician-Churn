@@ -283,7 +283,7 @@ Physician-Churn/
 
 **Matt Derya**  
 Data Scientist | GenAI & LLM Specialist | Clinical Pharmacy Expert  
-🔗 [linkedin.com/in/matt-derya](https://linkedin.com/in/matt-derya)  
-📧 mattderya@gmail.com  
+🔗 [linkedin.com/in/matt-derya](linkedin.com/in/mttdryai)  
+📧 mttdryai@gmail.com
 
 *15+ years pharmaceutical industry (OctaPharma, Mentor R&D) · 6+ years AI/ML production systems*
