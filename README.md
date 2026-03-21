@@ -8,6 +8,12 @@
 **Data:** 2,000 IQVIA-style synthetic physicians  
 
 ---
+## 🌐 Live Demo
+👉 **[physician-churn-production.up.railway.app](https://physician-churn-production.up.railway.app)**
+
+> PharmaCRM Intelligence Platform — Hybrid LSTM + XGBoost | FastAPI + Docker | Real-time SHAP explanations
+
+---
 
 ## ⚠️ Confidentiality Notice
 
