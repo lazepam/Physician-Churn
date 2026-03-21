@@ -286,4 +286,4 @@ Data Scientist | GenAI & LLM Specialist | Clinical Pharmacy Expert
 🔗 [linkedin.com/in/matt-derya](https://linkedin.com/in/matt-derya)  
 📧 mattderya@gmail.com  
 
-*20+ years pharmaceutical industry (OctaPharma, Mentor R&D) · 6+ years AI/ML production systems*
+*15+ years pharmaceutical industry (OctaPharma, Mentor R&D) · 6+ years AI/ML production systems*
